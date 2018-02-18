@@ -21,7 +21,7 @@ namespace Ether.Network.Tests.Contexts.NetConfig
         {
             this.Configuration.Host = "127.0.0.1";
             this.Configuration.Port = 4444;
-            this.Configuration.BufferSize = 1024;
+            this.Configuration.BufferSize = 512;
         }
     }
 }

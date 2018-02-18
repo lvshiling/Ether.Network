@@ -352,14 +352,14 @@ namespace Ether.Network.Server
             this._writePool.Clear();
             this._messageQueue.Clear();
 
+            if (this.Configuration.Blocking)
+                this._manualResetEvent.Set();
+
             if (this.Socket == null)
                 return;
 
             this.Socket.Dispose();
             this.Socket = null;
-            
-            if (this.Configuration.Blocking)
-                this._manualResetEvent.Set();
         }
 
         /// <summary>
@@ -399,7 +399,7 @@ namespace Ether.Network.Server
                 if (disposing)
                 {
                     this._sendQueueTaskCancelTokenSource.Cancel(false);
-                    this.ClearResources();
+                    this.Stop();
 
                     this._readPool.Dispose();
                     this._writePool.Dispose();
