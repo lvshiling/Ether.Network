@@ -106,21 +106,7 @@ namespace Ether.Network.Server
                 return;
 
             this.IsRunning = false;
-
-            this.ClearClients();
-            this._readPool.Clear();
-            this._writePool.Clear();
-
-            if (this.Configuration.Blocking)
-                this._manualResetEvent.Set();
-
-            if (this.Socket != null)
-            {
-                this.Socket.Dispose();
-                this.Socket = null;
-            }
-
-            this._messageQueue.Clear();
+            this.ClearResources();
         }
 
         /// <inheritdoc />
@@ -357,6 +343,26 @@ namespace Ether.Network.Server
         }
 
         /// <summary>
+        /// Clear the server's resources.
+        /// </summary>
+        private void ClearResources()
+        {
+            this.ClearClients();
+            this._readPool.Clear();
+            this._writePool.Clear();
+            this._messageQueue.Clear();
+
+            if (this.Socket == null)
+                return;
+
+            this.Socket.Dispose();
+            this.Socket = null;
+            
+            if (this.Configuration.Blocking)
+                this._manualResetEvent.Set();
+        }
+
+        /// <summary>
         /// Triggered when a <see cref="SocketAsyncEventArgs"/> async operation is completed.
         /// </summary>
         /// <param name="sender"></param>
@@ -393,11 +399,12 @@ namespace Ether.Network.Server
                 if (disposing)
                 {
                     this._sendQueueTaskCancelTokenSource.Cancel(false);
-                    this._readPool?.Dispose();
-                    this._writePool?.Dispose();
-                    this.ClearClients();
-                    this._messageQueue.Clear();
+                    this.ClearResources();
+
+                    this._readPool.Dispose();
+                    this._writePool.Dispose();
                     this._messageQueue.Dispose();
+
                     this._isDisposed = true;
                 }
             }
