@@ -18,8 +18,11 @@ namespace Ether.Network.Utils
         /// <returns>Parsed <see cref="IPAddress"/>.</returns>
         public static IPAddress GetIpAddress(string ipOrHost)
         {
-            string host = Dns.GetHostAddressesAsync(ipOrHost).Result.First().ToString();
+            if (string.IsNullOrEmpty(ipOrHost))
+                return null;
 
+            string host = Dns.GetHostAddressesAsync(ipOrHost).Result.First().ToString();
+            
             return IPAddress.TryParse(host, out IPAddress address) ? address : null;
         }
 
@@ -34,9 +37,9 @@ namespace Ether.Network.Utils
             IPAddress address = GetIpAddress(ipOrHost);
 
             if (address == null)
-                throw new EtherConfigurationException($"Invalid host or ip address: {ipOrHost}.");
+                throw new EtherConfigurationException($"Invalid host or ip address: '{ipOrHost}'.");
             if (port <= 0)
-                throw new EtherConfigurationException($"Invalid port: {port}");
+                throw new EtherConfigurationException($"Invalid port: '{port}'");
 
             return new IPEndPoint(address, port);
         }
