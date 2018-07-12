@@ -18,9 +18,16 @@ namespace Ether.Network.Utils
         /// <returns>Parsed <see cref="IPAddress"/>.</returns>
         public static IPAddress GetIpAddress(string ipOrHost)
         {
-            string host = Dns.GetHostAddressesAsync(ipOrHost).Result.First().ToString();
-
-            return IPAddress.TryParse(host, out IPAddress address) ? address : null;
+            if (IPAddress.TryParse(ipOrHost, out IPAddress address))
+            {
+                return address;
+            }
+            else
+            {
+                return Dns.GetHostAddressesAsync(ipOrHost).Result
+                    .Where(x => x.AddressFamily == AddressFamily.InterNetwork)
+                    .FirstOrDefault();
+            }
         }
 
         /// <summary>
